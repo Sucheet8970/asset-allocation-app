@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asset Deallocation</title>
+    {% load static %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: Roboto, sans-serif;
+            background-color: #f8f9fa;
+        }
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            position: fixed;
+            background: #343a40;
+            padding: 20px;
+            color: white;
+            display: flex;
+            flex-direction: column;
+        }
+    
+        .sidebar .logo {
+            text-align: center;
+            margin-bottom: 30px;
+            margin-top: 30px;
+        }
+    
+        .sidebar .logo img {
+            width: 140px;
+        }
+    
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+    
+        .sidebar a i {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+    
+        .sidebar a:hover {
+            background: #495057;
+        }
+        
+        .content {
+            margin-left: 260px;
+            padding: 20px;
+        }
+        .table-container {
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <img src="{% static 'images/Aequs-white11.png' %}" alt="Company Logo">
+        </div>
+        <a href="{% url 'dashboard' %}"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+        <a href="{% url 'inventory' %}"><i class="fa-solid fa-laptop"></i> Inventory</a>
+        <a href="{% url 'new_allocation' %}"><i class="fa-solid fa-user-plus"></i> New Allocation</a>
+        <a href="{% url 'asset_deallocation' %}" class="active"><i class="fa-solid fa-user-minus"></i> Deallocation</a>
+        <a href="{% url 'faulty_asset_replacement' %}" class="active"><i class="fa-solid fa-exclamation-triangle"></i> Faulty Asset Replacement</a>
+        <a href="{% url 'logout' %}"><i class="fa-solid fa-sign-out-alt"></i> Logout</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+        <h2><b>Asset Deallocation</b></h2>
+        <br>
+
+        <!-- Form for Deallocation -->
+        <div class="table-container">
+            <h4><b>Select Asset for Deallocation</b></h4>
+            <br>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label">Select Allocated Laptop</label>
+                    <select class="form-control" name="laptop_id" required>
+                        <option value="">Select a Laptop</option>
+                        {% for asset in allocated_assets %}
+                            <option value="{{ asset.laptop.id }}">{{ asset.laptop.asset_host_name }}</option>
+                        {% empty %}
+                            <option disabled>No allocated assets</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Has Data Been Transferred?</label>
+                    <select class="form-control" name="data_transferred" required>
+                        <option value="no">No</option>
+                        <option value="yes">Yes</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Format Laptop?</label>
+                    <select class="form-control" name="formatted">
+                        <option value="no">No</option>
+                        <option value="yes">Yes</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-danger">Deallocate</button>
+            </form>
+        </div>
+
+        <!-- Deallocated Assets Table -->
+        <!-- Deallocated Assets Table -->
+<div class="table-container mt-4">
+    <h4>Deallocated Assets</h4>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Asset Host Name</th>
+                <th>Engineer Name</th>
+                <th>Email</th>
+                <th>Deallocation Date</th>
+                <th>Formatted</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for deallocation in deallocated_assets %}
+            <tr>
+                <td>{{ deallocation.laptop.asset_host_name }}</td>
+                <td>{{ deallocation.engineer_name }}</td>
+                <td>{{ deallocation.email }}</td>
+                <td>{{ deallocation.deallocation_date|date:"Y-m-d" }}</td>
+                <td>{{ deallocation.formatted|yesno:"Yes,No" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">No deallocations yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

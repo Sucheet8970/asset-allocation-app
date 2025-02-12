@@ -1,0 +1,38 @@
+
+APP_DIRS': True
+BACKEND': 'django.template.backends.django.DjangoTemplates
+DIRS': []
+ENGINE': 'django.db.backends.mysql
+HOST': 'localhost
+NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator
+NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator
+NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator
+NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator
+NAME': 'laptop_allocation_db
+OPTIONS': {
+PASSWORD': 'admin@1234
+PORT': '3306
+USER': 'admin
+accounts
+context_processors': [
+default': {
+django
+django.contrib.admin
+django.contrib.auth
+django.contrib.auth.context_processors.auth
+django.contrib.auth.middleware.AuthenticationMiddleware
+django.contrib.contenttypes
+django.contrib.messages
+django.contrib.messages.context_processors.messages
+django.contrib.messages.middleware.MessageMiddleware
+django.contrib.sessions
+django.contrib.sessions.middleware.SessionMiddleware
+django.contrib.staticfiles
+django.middleware.clickjacking.XFrameOptionsMiddleware
+django.middleware.common.CommonMiddleware
+django.middleware.csrf.CsrfViewMiddleware
+django.middleware.security.SecurityMiddleware
+django.template.context_processors.debug
+django.template.context_processors.request
+djangorestframework
+mysqlclient

@@ -6,10 +6,10 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.http import HttpResponse
 from django.urls import reverse
-from .models import Inventory, Laptop, Allocation 
+from .models import Inventory, Laptop, Allocation, Deallocation 
 from django.contrib.auth.decorators import user_passes_test
 
-
+'''--------------------------------------------------------------LOGIN------------------------------------------------------------------------------'''
 # User Authentication Views
 def login_view(request):
     if request.method == "POST":
@@ -24,7 +24,7 @@ def login_view(request):
             messages.error(request, "Invalid username or password")
 
     return render(request, 'accounts/login.html')
-
+'''--------------------------------------------------------------------DASHBOARD-----------------------------------------------------------------------'''
 @login_required
 def dashboard_view(request):
     total_laptops = Inventory.objects.count()
@@ -62,10 +62,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Inventory
 
-@login_required
-
-@login_required
-
+'''--------------------------------------------------------------------INVENTORY---------------------------------------------------------------------------------------------------------------------'''
 @login_required
 def inventory_view(request):
     search_query = request.GET.get("search", "").strip()  # ✅ Get search query
@@ -160,13 +157,11 @@ def update_license_status(request, laptop_id):
 
     return redirect("inventory")
 
-
-
-
+'''-----------------------------------------------------------------------------new_allocation-----------------------------------------------------------------------------------------'''
 # Laptop Allocation
 @login_required
 def new_allocation_view(request):
-    available_laptops = Inventory.objects.filter(allocation_status="Available")
+    available_laptops = Inventory.objects.filter(allocation_status__in=["Available", "Deallocated"])
     allocated_laptops = Allocation.objects.select_related("laptop").all()  
 
     if request.method == "POST":
@@ -208,6 +203,7 @@ def new_allocation_view(request):
     })
 
 
+
 def send_allocation_email(allocation):
     confirmation_url = f"http://127.0.0.1:8000/confirm-receipt/{allocation.id}/"
     
@@ -240,10 +236,13 @@ def confirm_receipt(request, allocation_id):
     
     return HttpResponse("<h2>✅ Thank you! Your receipt has been confirmed.</h2>")
 
+'''-----------------------------------------------------------useless-------------------------------------------------------------------------------'''
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Inventory, Allocation
+
+'''-----------------------------------------------------------------FAULTY ASSET REPLACEMENT---------------------------------------------------------------------------------------------------------------------------'''
 
 # 🔹 Faulty Asset Replacement
 @login_required
@@ -317,60 +316,49 @@ def repair_asset_view(request, asset_id=None):  # Ensure `asset_id` is an argume
     messages.success(request, f"{asset.asset_host_name} has been repaired and is now available.")
     return redirect("faulty_asset_replacement")
 
-'''---------------------------------------------------------------------------------------------------------------------------------------------------'''
+'''------------------------------------------------------------------------DEALLOCATION---------------------------------------------------------------------------'''
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from .models import Inventory, Allocation, Deallocation
+
 @login_required
-def deallocation_view(request):
-    """Handles deallocating assets from ex-employees and displays deallocated assets."""
-
-    # 🔹 Get employees who currently have an allocated laptop
-    allocated_employees = Allocation.objects.filter(laptop__allocation_status="Allocated")
-
-    # 🔹 Get deallocated laptops (previously allocated but now available)
-    deallocated_assets = Inventory.objects.filter(
-    allocation_status="Available"
-).exclude(id__in=Allocation.objects.values_list("laptop_id", flat=True))
-
-
-    selected_employee_id = request.GET.get("employee_id")
-    selected_employee = None
-    allocated_laptop = None
-
-    if selected_employee_id:
-        selected_employee = get_object_or_404(Allocation, id=selected_employee_id)
-        allocated_laptop = selected_employee.laptop  # Get the allocated laptop
+def asset_deallocation(request):
+    allocated_assets = Allocation.objects.all()  # Fetch allocated assets
+    deallocated_assets = Deallocation.objects.all()  # Fetch deallocated assets
 
     if request.method == "POST":
-        employee_id = request.POST.get("employee_id")
-        data_transfer_status = request.POST.get("data_transfer_status")
-        
-        if employee_id:
-            allocation = get_object_or_404(Allocation, id=employee_id)
-            laptop = allocation.laptop
+        laptop_id = request.POST.get("laptop_id")
+        data_transferred = request.POST.get("data_transferred") == "yes"
 
-            # ✅ Mark laptop as "Available"
-            laptop.allocation_status = "Available"
-            laptop.data_transfer_status = data_transfer_status  # Save data transfer status
+        laptop = get_object_or_404(Inventory, id=laptop_id)
+        allocation = get_object_or_404(Allocation, laptop=laptop)
+
+        if data_transferred:
+            formatted = request.POST.get("formatted") == "yes"
+
+            # Update Inventory
+            laptop.allocation_status = "Deallocated"
+            laptop.license_status = "Pending"
+            laptop.installed_apps = ""  # Clear installed apps
             laptop.save()
 
-            # ✅ Remove allocation entry
+            # Save to Deallocation Table
+            Deallocation.objects.create(
+                laptop=laptop,
+                engineer_name=allocation.engineer_name,
+                email=allocation.email,
+                data_transferred=True,
+                formatted=formatted,
+            )
+
+            # Remove from Allocation Table
             allocation.delete()
 
-            messages.success(request, f"Laptop {laptop.asset_host_name} has been deallocated and is now available.")
-            return redirect("deallocation")
+        return redirect("asset_deallocation")
 
-    return render(request, "accounts/deallocation.html", {
-        "allocated_employees": allocated_employees,
-        "selected_employee": selected_employee,
-        "allocated_laptop": allocated_laptop,
-        "deallocated_assets": deallocated_assets,
+    return render(request, "accounts/asset_deallocation.html", {
+        "allocated_assets": allocated_assets,
+        "deallocated_assets": deallocated_assets,  # Pass to template
     })
 
-def format_laptop_view(request, asset_id):
-    asset = get_object_or_404(Inventory, id=asset_id, allocation_status="Deallocated")
 
-    # ✅ Clear installed applications permanently
-    asset.installed_applications = ""
-    asset.save()
-
-    messages.success(request, f"All installed applications have been removed from {asset.asset_host_name}.")
-    return redirect("deallocation")

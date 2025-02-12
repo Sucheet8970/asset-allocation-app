@@ -56,8 +56,8 @@ ROOT_URLCONF = 'laptop_allocation.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
+        'DIRS': [BASE_DIR / "templates"],  # Ensure this is correct
+        'APP_DIRS': True,  # This should be True for templates inside apps
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -68,6 +68,7 @@ TEMPLATES = [
         },
     },
 ]
+
 
 WSGI_APPLICATION = 'laptop_allocation.wsgi.application'
 
