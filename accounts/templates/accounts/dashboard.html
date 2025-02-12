@@ -36,17 +36,17 @@
             display: flex;
             flex-direction: column;
         }
-        
+    
         .sidebar .logo {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
             margin-top: 30px;
         }
-        
+    
         .sidebar .logo img {
             width: 140px;
         }
-        
+    
         .sidebar a {
             color: white;
             text-decoration: none;
@@ -58,14 +58,13 @@
             font-size: 16px;
             transition: 0.3s;
         }
-        
+    
         .sidebar a i {
             margin-right: 10px;
             font-size: 18px;
         }
-        
-        .sidebar a:hover,
-        .sidebar a.active {
+    
+        .sidebar a:hover {
             background: #495057;
         }
         
@@ -160,6 +159,7 @@
         <a href="{% url 'dashboard' %}" class="active"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
         <a href="{% url 'inventory' %}"><i class="fa-solid fa-laptop"></i> Inventory</a>
         <a href="{% url 'new_allocation' %}"><i class="fa-solid fa-user-plus"></i> New Allocation</a>
+        <a href="{% url 'deallocation' %}" class="active"><i class="fa-solid fa-user-slash"></i> Deallocation</a>
         <a href="{% url 'faulty_asset_replacement' %}"><i class="fa-solid fa-exclamation-triangle"></i> Faulty Asset Replacement</a>
         <a href="{% url 'logout' %}"><i class="fa-solid fa-sign-out-alt"></i> Logout</a>
     </div>

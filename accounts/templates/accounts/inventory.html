@@ -17,7 +17,7 @@
             font-family: Roboto, sans-serif;
             background-color: #f8f9fa;
         }
-        
+    
         .sidebar {
             width: 250px;
             height: 100vh;
@@ -28,17 +28,17 @@
             display: flex;
             flex-direction: column;
         }
-        
+    
         .sidebar .logo {
             text-align: center;
             margin-bottom: 30px;
             margin-top: 30px;
         }
-        
+    
         .sidebar .logo img {
             width: 140px;
         }
-        
+    
         .sidebar a {
             color: white;
             text-decoration: none;
@@ -50,34 +50,103 @@
             font-size: 16px;
             transition: 0.3s;
         }
-        
+    
         .sidebar a i {
             margin-right: 10px;
             font-size: 18px;
         }
-        
+    
         .sidebar a:hover {
             background: #495057;
         }
-        
+    
         .content {
             margin-left: 260px;
             padding: 20px;
         }
-        
+    
         .table-container {
             background: #fff;
             padding: 15px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-        
+    
         table th,
         table td {
             text-align: center;
             vertical-align: middle;
         }
+    
+        /* Style for Edit License Status Modal */
+        .modal-content {
+            border-radius: 10px;
+        }
+    
+        .modal-header {
+            background-color: #0056b3;
+            color: white;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+    
+        .modal-title {
+            font-weight: bold;
+        }
+    
+        .modal-body {
+            padding: 20px;
+        }
+    
+        .modal-body label {
+            font-weight: 600;
+            margin-top: 10px;
+        }
+    
+        .modal-body select {
+            width: 100%;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+    
+        .modal-footer {
+            display: flex;
+            justify-content: space-between;
+        }
+    
+        .btn-close {
+            background: none;
+            border: none;
+        }
+    
+        .btn-primary,
+        .btn-danger {
+            padding: 8px 15px;
+            font-size: 14px;
+            border-radius: 5px;
+        }
+    
+        .btn-primary {
+            background-color: #0056b3;
+            border: none;
+        }
+    
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+    
+        .btn-danger {
+            background-color: #0056b3;
+            border: none;
+        }
+    
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
     </style>
+    
+
 </head>
 
 <body>
@@ -88,6 +157,7 @@
         <a href="{% url 'dashboard' %}"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
         <a href="{% url 'inventory' %}" class="active"><i class="fa-solid fa-laptop"></i> Inventory</a>
         <a href="{% url 'new_allocation' %}"><i class="fa-solid fa-user-plus"></i> New Allocation</a>
+        <a href="{% url 'deallocation' %}" class="active"><i class="fa-solid fa-user-slash"></i> Deallocation</a>
         <a href="{% url 'faulty_asset_replacement' %}"><i class="fa-solid fa-exclamation-triangle"></i> Faulty Asset Replacement</a>
         <a href="{% url 'logout' %}"><i class="fa-solid fa-sign-out-alt"></i> Logout</a>
     </div>
@@ -117,14 +187,6 @@
                     <label class="form-check-label">{{ app }}</label>
                 </div>
                 {% endfor %}
-
-
-
-                <label class="form-label">License Status</label>
-                <input type="text" class="form-control" name="license_status" required>
-
-
-
 
                 <button type="submit" class="btn btn-primary mt-3">Add Laptop</button>
             </form>
@@ -160,7 +222,23 @@
                             <td>{{ forloop.counter }}</td>
                             <td>{{ laptop.asset_host_name }}</td>
                             <td>{{ laptop.installed_apps }}</td>
-                            <td>{{ laptop.license_status }}</td>
+                            <td>{{ laptop.license_status }}
+                                <!-- Edit License Status Button -->
+                                {% if request.user.groups.all.0.name == "License Engineers" %}
+    <!-- If user is in License Engineers group, show the active button -->
+    <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#editLicenseModal{{ laptop.id }}">
+        <i class="fa-solid fa-key"></i> Edit
+    </button>
+{% else %}
+    <!-- If user is NOT in License Engineers group, show a disabled button -->
+    <button class="btn btn-secondary btn-sm" disabled>
+        <i class="fa-solid fa-lock"></i> Locked
+    </button>
+{% endif %}
+
+                            
+                            </td>
+                            
                             <td>{{ laptop.allocation_status }}</td>
 
                             <td>
@@ -168,6 +246,11 @@
                                 <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal{{ laptop.id }}">
                                     <i class="fa-solid fa-edit"></i>
                                 </button>
+                                
+
+
+
+                                
 
                                 <!-- Delete Button -->
                                 <form method="POST" style="display:inline;">
@@ -200,12 +283,7 @@
 
                                             <label class="form-label">Installed Applications</label>
                                             <input type="text" class="form-control" name="installed_apps" value="{{ laptop.installed_apps }}">
-
-                                            <label class="form-label">Installation Status</label>
-                                            <input type="text" class="form-control" name="installation_status" value="{{ laptop.installation_status }}" required>
-
-                                            <label class="form-label">License Status</label>
-                                            <input type="text" class="form-control" name="license_status" value="{{ laptop.license_status }}" required>
+                                            
                                         </div>
 
                                         <div class="modal-footer">
@@ -216,12 +294,60 @@
                             </div>
                         </div>
 
+                        <td>
+                            
+                        
+                            <!-- Edit License Modal -->
+                            <div class="modal fade" id="editLicenseModal{{ laptop.id }}" tabindex="-1" aria-labelledby="editLicenseModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Edit License Status</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <form method="POST" action="{% url 'update_license_status' laptop.id %}">
+                                            {% csrf_token %}
+                                            
+                                            <label for="sophos_status">Sophos Antivirus:</label>
+                                            <select name="sophos_status">
+                                                <option value="Pending" {% if laptop.sophos_status == "Pending" %}selected{% endif %}>Pending</option>
+                                                <option value="Confirmed" {% if laptop.sophos_status == "Confirmed" %}selected{% endif %}>Confirmed</option>
+                                            </select>
+                                        
+                                            <label for="patch_manager_status">Patch Manager:</label>
+                                            <select name="patch_manager_status">
+                                                <option value="Pending" {% if laptop.patch_manager_status == "Pending" %}selected{% endif %}>Pending</option>
+                                                <option value="Confirmed" {% if laptop.patch_manager_status == "Confirmed" %}selected{% endif %}>Confirmed</option>
+                                            </select>
+                                        
+                                            <label for="sase_proxy_status">SASE Proxy Agent:</label>
+                                            <select name="sase_proxy_status">
+                                                <option value="Pending" {% if laptop.sase_proxy_status == "Pending" %}selected{% endif %}>Pending</option>
+                                                <option value="Confirmed" {% if laptop.sase_proxy_status == "Confirmed" %}selected{% endif %}>Confirmed</option>
+                                            </select>
+                                        
+                                            <label for="summit_status">Summit:</label>
+                                            <select name="summit_status">
+                                                <option value="Pending" {% if laptop.summit_status == "Pending" %}selected{% endif %}>Pending</option>
+                                                <option value="Confirmed" {% if laptop.summit_status == "Confirmed" %}selected{% endif %}>Confirmed</option>
+                                            </select>
+                                        
+                                            <button type="submit">Update License Status</button>
+                                        </form>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
+
+    
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>

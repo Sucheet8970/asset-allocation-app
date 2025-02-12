@@ -82,6 +82,7 @@
         <a href="{% url 'dashboard' %}"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
         <a href="{% url 'inventory' %}"><i class="fa-solid fa-laptop"></i> Inventory</a>
         <a href="{% url 'new_allocation' %}" class="active"><i class="fa-solid fa-user-plus"></i> New Allocation</a>
+        <a href="{% url 'deallocation' %}" class="active"><i class="fa-solid fa-user-slash"></i> Deallocation</a>
         <a href="{% url 'faulty_asset_replacement' %}"><i class="fa-solid fa-exclamation-triangle"></i> Faulty Asset Replacement</a>
         <a href="{% url 'logout' %}"><i class="fa-solid fa-sign-out-alt"></i> Logout</a>
     </div>
@@ -130,6 +131,7 @@
                         <th>Asset Host Name</th>
                         <th>Engineer Name</th>
                         <th>Email</th>
+                        <th>Allocated Date</th>
                         <th>Allocation Status</th>
                         <th>Email Status</th>
                         <!-- Confirmed or Pending -->
@@ -143,6 +145,7 @@
                         <!-- ✅ Fetch from related Inventory -->
                         <td>{{ allocation.engineer_name }}</td>
                         <td>{{ allocation.email }}</td>
+                        <td>{{ allocation.allocation_date}}</td>
                         <td><b style="color: blue;">Allocated</b></td>
                         <td>
                             {% if allocation.confirmed %}

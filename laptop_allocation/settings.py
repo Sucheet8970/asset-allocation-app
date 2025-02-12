@@ -79,8 +79,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'laptop_allocation_db',
-        'USER': 'admin',
-        'PASSWORD': 'admin@1234',
+        'USER': 'root',
+        'PASSWORD': 'NewPassword123',
         'HOST': 'localhost',
         'PORT': '3306',
     }

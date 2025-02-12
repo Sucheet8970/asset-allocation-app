@@ -7,6 +7,8 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.urls import reverse
 from .models import Inventory, Laptop, Allocation 
+from django.contrib.auth.decorators import user_passes_test
+
 
 # User Authentication Views
 def login_view(request):
@@ -63,6 +65,7 @@ from .models import Inventory
 @login_required
 
 @login_required
+
 @login_required
 def inventory_view(request):
     search_query = request.GET.get("search", "").strip()  # ✅ Get search query
@@ -86,15 +89,14 @@ def inventory_view(request):
                 return redirect("inventory")
 
             installed_apps = request.POST.getlist("installed_apps")
-            received_from_left_employee = request.POST.get("received_from_left_employee", "No")
 
             Inventory.objects.create(
                 asset_host_name=asset_host_name,
                 installed_apps=", ".join(installed_apps),
-                license_status=request.POST.get("license_status"),
                 allocation_status="Available",  # ✅ Set default as "Available"
-                
+                license_status="Pending",  # ✅ Default license status
             )
+            messages.success(request, "New laptop added successfully!")
             return redirect("inventory")
 
         elif action == "edit":
@@ -108,10 +110,8 @@ def inventory_view(request):
 
             laptop.asset_host_name = new_asset_host_name
             laptop.installed_apps = ", ".join(request.POST.getlist("installed_apps"))
-            laptop.license_status = request.POST.get("license_status")
-            laptop.received_from_left_employee = request.POST.get("received_from_left_employee", "No")
-
             laptop.save()
+
             messages.success(request, "Laptop updated successfully!")
             return redirect("inventory")
 
@@ -119,6 +119,8 @@ def inventory_view(request):
             laptop_id = request.POST.get("laptop_id")
             laptop = get_object_or_404(Inventory, id=laptop_id)
             laptop.delete()
+
+            messages.success(request, "Laptop deleted successfully!")
             return redirect("inventory")
 
     return render(request, "accounts/inventory.html", {
@@ -126,6 +128,40 @@ def inventory_view(request):
         "application_choices": application_choices,
         "search_query": search_query,
     })
+
+def is_license_engineer(user):
+    return user.groups.filter(name="License Engineers").exists()
+
+@login_required
+@user_passes_test(is_license_engineer)
+def update_license_status(request, laptop_id):
+    laptop = get_object_or_404(Inventory, id=laptop_id)
+
+    if request.method == "POST":
+        print("📩 Received Form Data:", request.POST)  # Debugging Line
+
+        laptop.sophos_status = request.POST.get("sophos_status", "Pending")
+        laptop.patch_manager_status = request.POST.get("patch_manager_status", "Pending")
+        laptop.sase_proxy_status = request.POST.get("sase_proxy_status", "Pending")
+        laptop.summit_status = request.POST.get("summit_status", "Pending")
+
+        # ✅ Check if all are confirmed, then update main status
+        if (laptop.sophos_status == "Confirmed" and 
+            laptop.patch_manager_status == "Confirmed" and 
+            laptop.sase_proxy_status == "Confirmed" and 
+            laptop.summit_status == "Confirmed"):
+            laptop.license_status = "Active"
+        else:
+            laptop.license_status = "Pending"
+
+        laptop.save()
+
+        print("✅ Updated Status:", laptop.sophos_status, laptop.patch_manager_status, laptop.sase_proxy_status, laptop.summit_status, laptop.license_status)  # Debugging Line
+
+    return redirect("inventory")
+
+
+
 
 # Laptop Allocation
 @login_required
@@ -204,7 +240,12 @@ def confirm_receipt(request, allocation_id):
     
     return HttpResponse("<h2>✅ Thank you! Your receipt has been confirmed.</h2>")
 
-# Faulty Asset Replacement
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from .models import Inventory, Allocation
+
+# 🔹 Faulty Asset Replacement
 @login_required
 def faulty_asset_replacement_view(request):
     search_query = request.GET.get("search", "").strip()
@@ -218,6 +259,7 @@ def faulty_asset_replacement_view(request):
     # 🔹 Apply search filter
     if search_query:
         allocated_assets = allocated_assets.filter(asset_host_name__icontains=search_query)
+        decommissioned_assets = decommissioned_assets.filter(asset_host_name__icontains=search_query)
 
     # 🔹 Get available laptops for replacement
     available_laptops = Inventory.objects.filter(allocation_status="Available")
@@ -257,15 +299,78 @@ def faulty_asset_replacement_view(request):
         "search_query": search_query,
     })
 
-def repair_asset_view(request, asset_id):
-    # Get the decommissioned asset
+# 🔹 Repair Asset View with Search
+@login_required
+def repair_asset_view(request, asset_id=None):  # Ensure `asset_id` is an argument
+    if asset_id is None:
+        messages.error(request, "Invalid asset ID.")
+        return redirect("faulty_asset_replacement")
+
     asset = get_object_or_404(Inventory, id=asset_id, allocation_status="Decommissioned")
-    
+
     # ✅ Mark the asset as "Available" again
     asset.allocation_status = "Available"
-    asset.replaced_with = None  # Remove the replaced laptop reference
+    asset.replaced_with = None  # Remove replaced laptop reference
     asset.last_assigned_engineer = None  # Remove engineer name
     asset.save()
 
     messages.success(request, f"{asset.asset_host_name} has been repaired and is now available.")
     return redirect("faulty_asset_replacement")
+
+'''---------------------------------------------------------------------------------------------------------------------------------------------------'''
+@login_required
+def deallocation_view(request):
+    """Handles deallocating assets from ex-employees and displays deallocated assets."""
+
+    # 🔹 Get employees who currently have an allocated laptop
+    allocated_employees = Allocation.objects.filter(laptop__allocation_status="Allocated")
+
+    # 🔹 Get deallocated laptops (previously allocated but now available)
+    deallocated_assets = Inventory.objects.filter(
+    allocation_status="Available"
+).exclude(id__in=Allocation.objects.values_list("laptop_id", flat=True))
+
+
+    selected_employee_id = request.GET.get("employee_id")
+    selected_employee = None
+    allocated_laptop = None
+
+    if selected_employee_id:
+        selected_employee = get_object_or_404(Allocation, id=selected_employee_id)
+        allocated_laptop = selected_employee.laptop  # Get the allocated laptop
+
+    if request.method == "POST":
+        employee_id = request.POST.get("employee_id")
+        data_transfer_status = request.POST.get("data_transfer_status")
+        
+        if employee_id:
+            allocation = get_object_or_404(Allocation, id=employee_id)
+            laptop = allocation.laptop
+
+            # ✅ Mark laptop as "Available"
+            laptop.allocation_status = "Available"
+            laptop.data_transfer_status = data_transfer_status  # Save data transfer status
+            laptop.save()
+
+            # ✅ Remove allocation entry
+            allocation.delete()
+
+            messages.success(request, f"Laptop {laptop.asset_host_name} has been deallocated and is now available.")
+            return redirect("deallocation")
+
+    return render(request, "accounts/deallocation.html", {
+        "allocated_employees": allocated_employees,
+        "selected_employee": selected_employee,
+        "allocated_laptop": allocated_laptop,
+        "deallocated_assets": deallocated_assets,
+    })
+
+def format_laptop_view(request, asset_id):
+    asset = get_object_or_404(Inventory, id=asset_id, allocation_status="Deallocated")
+
+    # ✅ Clear installed applications permanently
+    asset.installed_applications = ""
+    asset.save()
+
+    messages.success(request, f"All installed applications have been removed from {asset.asset_host_name}.")
+    return redirect("deallocation")
