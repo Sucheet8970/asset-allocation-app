@@ -8,6 +8,7 @@ from django.http import HttpResponse
 from django.urls import reverse
 from .models import Inventory, Laptop, Allocation, Deallocation 
 from django.contrib.auth.decorators import user_passes_test
+import pandas as pd
 
 '''--------------------------------------------------------------LOGIN------------------------------------------------------------------------------'''
 # User Authentication Views
@@ -119,6 +120,20 @@ def inventory_view(request):
 
             messages.success(request, "Laptop deleted successfully!")
             return redirect("inventory")
+        
+        # ✅ Add confirmed licenses for each laptop
+    for laptop in laptops:
+        confirmed_licenses = []
+        if laptop.sophos_status == "Confirmed":
+            confirmed_licenses.append("Sophos Antivirus")
+        if laptop.patch_manager_status == "Confirmed":
+            confirmed_licenses.append("Patch Manager")
+        if laptop.sase_proxy_status == "Confirmed":
+            confirmed_licenses.append("SASE Proxy Agent")
+        if laptop.summit_status == "Confirmed":
+            confirmed_licenses.append("Summit")
+        laptop.confirmed_licenses = ", ".join(confirmed_licenses) if confirmed_licenses else "None"
+
 
     return render(request, "accounts/inventory.html", {
         "laptops": laptops,
@@ -156,6 +171,43 @@ def update_license_status(request, laptop_id):
         print("✅ Updated Status:", laptop.sophos_status, laptop.patch_manager_status, laptop.sase_proxy_status, laptop.summit_status, laptop.license_status)  # Debugging Line
 
     return redirect("inventory")
+
+@login_required
+def export_inventory_to_excel(request):
+    """Generate an Excel file of the inventory and serve it as a download."""
+    laptops = Inventory.objects.all()
+
+    # ✅ Prepare data for the Excel file
+    data = []
+    for laptop in laptops:
+        confirmed_licenses = []
+        if laptop.sophos_status == "Confirmed":
+            confirmed_licenses.append("Sophos Antivirus")
+        if laptop.patch_manager_status == "Confirmed":
+            confirmed_licenses.append("Patch Manager")
+        if laptop.sase_proxy_status == "Confirmed":
+            confirmed_licenses.append("SASE Proxy Agent")
+        if laptop.summit_status == "Confirmed":
+            confirmed_licenses.append("Summit")
+
+        data.append([
+            laptop.asset_host_name,
+            laptop.installed_apps,
+            laptop.license_status,
+            ", ".join(confirmed_licenses) if confirmed_licenses else "None"
+        ])
+
+    # ✅ Create a Pandas DataFrame
+    df = pd.DataFrame(data, columns=["Asset Host Name", "Installed Applications", "License Status", "Confirmed Licenses"])
+
+    # ✅ Convert DataFrame to Excel format
+    response = HttpResponse(content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    response["Content-Disposition"] = 'attachment; filename="inventory.xlsx"'
+    
+    with pd.ExcelWriter(response, engine="openpyxl") as writer:
+        df.to_excel(writer, sheet_name="Inventory", index=False)
+
+    return response
 
 '''-----------------------------------------------------------------------------new_allocation-----------------------------------------------------------------------------------------'''
 # Laptop Allocation

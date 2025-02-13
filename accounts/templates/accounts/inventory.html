@@ -211,6 +211,7 @@
                             <th>Asset Host Name</th>
                             <th>Installed Applications</th>
                             <th>License Status</th>
+                            <th>Confirmed Licenses</th>
                             <th>Allocation Status</th>
 
                             <th>Actions</th>
@@ -238,7 +239,7 @@
 
                             
                             </td>
-                            
+                            <td>{{ laptop.confirmed_licenses }}</td>
                             <td>{{ laptop.allocation_status }}</td>
 
                             <td>
@@ -246,11 +247,6 @@
                                 <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal{{ laptop.id }}">
                                     <i class="fa-solid fa-edit"></i>
                                 </button>
-                                
-
-
-
-                                
 
                                 <!-- Delete Button -->
                                 <form method="POST" style="display:inline;">
@@ -339,10 +335,12 @@
                                 </div>
                             </div>
                         </td>
-                        
                         {% endfor %}
                     </tbody>
                 </table>
+                <form action="{% url 'export_inventory' %}" method="GET">
+                    <button type="submit" class="btn btn-success">Download as Excel</button>
+                </form>
             </div>
         </div>
     </div>

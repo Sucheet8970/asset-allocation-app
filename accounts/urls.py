@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import (
     login_view, dashboard_view, logout_view, inventory_view, new_allocation_view, confirm_receipt,
-    faulty_asset_replacement_view, repair_asset_view, update_license_status, asset_deallocation
+    faulty_asset_replacement_view, repair_asset_view, update_license_status, asset_deallocation, export_inventory_to_excel
 )
 
 urlpatterns = [
@@ -9,6 +9,7 @@ urlpatterns = [
     path('dashboard/', dashboard_view, name='dashboard'),
     path('logout/', logout_view, name='logout'),
     path("inventory/", inventory_view, name="inventory"),
+     path("inventory/download/", export_inventory_to_excel, name="export_inventory"),
     path("new_allocation/", new_allocation_view, name="new_allocation"),
     path("confirm-receipt/<int:allocation_id>/", confirm_receipt, name="confirm-receipt"),
     path("faulty_asset_replacement/", faulty_asset_replacement_view, name="faulty_asset_replacement"),
