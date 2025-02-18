@@ -61,14 +61,20 @@
         .content {
             margin-left: 260px;
             padding: 20px;
+            width: 80%;
         }
         
         .table-container {
             background: #fff;
-            padding: 15px;
+            padding: 20px;
             border-radius: 8px;
+            width: 80%;
+            table-layout: fixed;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-left: 280px;
+
         }
+
     </style>
 </head>
 
@@ -87,43 +93,197 @@
         <a href="{% url 'logout' %}"><i class="fa-solid fa-sign-out-alt"></i> Logout</a>
     </div>
 
-    <!-- Main Content -->
-    <div class="content">
-        <h2><b>New Allocation</b></h2>
-        <br>
+<!-- Main Content -->
+<div class="content">
+    <h2><b>New Allocation</b></h2>
+</div>
 
-        <!-- Form to Allocate Laptop -->
-        <div class="table-container">
-            <h4><b>Allocate Laptop</b></h4>
-            <br>
-            <form method="POST">
-                {% csrf_token %}
-                <div class="mb-3">
-                    <label class="form-label">Engineer Name</label>
-                    <input type="text" class="form-control" name="engineer_name" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Email</label>
-                    <input type="email" class="form-control" name="email" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Select Laptop</label>
-                    <select class="form-control" name="laptop">
-                        <option value="">Select a Laptop</option>
-                        {% for laptop in available_laptops %}
-                            <option value="{{ laptop.id }}">{{ laptop.asset_host_name }}</option>
-                        {% empty %}
-                        <option disabled>No available laptops</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <button type="submit" class="btn btn-primary">Allocate</button>
-            </form>
+<!-- Form to Allocate Laptop -->
+<div class="table-container">
+    <h4><b>Allocate Laptop</b></h4>
+    <br>
+    <form method="POST">
+        {% csrf_token %}
+
+        <!-- Engineer Details -->
+        <h5><b>Engineer Details</b></h5>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Engineer Name</label>
+                <input type="text" class="form-control" name="engineer_name" required>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" name="email" required>
+            </div>
         </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Select Laptop</label>
+                <select class="form-control" name="laptop">
+                    <option value="">Select a Laptop</option>
+                    {% for laptop in available_laptops %}
+                        <option value="{{ laptop.id }}">{{ laptop.asset_host_name }}</option>
+                    {% empty %}
+                        <option disabled>No available laptops</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <!-- Custodian Details -->
+        <h5><b>Custodian Details</b></h5>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Employee ID</label>
+                <input type="text" class="form-control" name="emp_id">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Location</label>
+                <input type="text" class="form-control" name="location">
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Building</label>
+                <input type="text" class="form-control" name="building">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Seat #</label>
+                <input type="text" class="form-control" name="seat_no">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Contact #</label>
+                <input type="text" class="form-control" name="contact_no">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Request #</label>
+                <input type="text" class="form-control" name="request_no">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Department</label>
+                <input type="text" class="form-control" name="department">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Manager</label>
+                <input type="text" class="form-control" name="manager">
+            </div>
+        </div>
+
+        <!-- Allocation Category -->
+        <h5><b>Allocation Category</b></h5>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Project Specific</label>
+                <input type="text" class="form-control" name="project_specific">
+            </div>
+        </div>
+
+        <!-- Asset Category -->
+        <h5><b>Asset Category</b></h5>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Laptop</label>
+                <input type="text" class="form-control" name="laptop_category">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Others (Optional)</label>
+                <input type="text" class="form-control" name="other_assets">
+            </div>
+        </div>
+
+        <!-- Asset Allocation Type -->
+        <h5><b>Asset Allocation Type</b></h5>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Short Term</label>
+                <input type="text" class="form-control" name="short_term">
+            </div>
+        </div>
+
+        <!-- Hardware Details -->
+        <h5><b>Hardware Details</b></h5>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Manufacturer</label>
+                <input type="text" class="form-control" name="manufacturer">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Processor</label>
+                <input type="text" class="form-control" name="processor">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Adapter</label>
+                <input type="text" class="form-control" name="adapter">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Asset Tag Number</label>
+                <input type="text" class="form-control" name="asset_tag_number">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">RAM Size</label>
+                <input type="text" class="form-control" name="ram_size">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Mouse</label>
+                <input type="text" class="form-control" name="mouse">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Serial #</label>
+                <input type="text" class="form-control" name="serial_number">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Model</label>
+                <input type="text" class="form-control" name="model">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Hard Disk</label>
+                <input type="text" class="form-control" name="hard_disk">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Bag</label>
+                <input type="text" class="form-control" name="bag">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Battery SL</label>
+                <input type="text" class="form-control" name="battery_sl">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Other Description (Optional)</label>
+                <textarea class="form-control" name="other_description"></textarea>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Allocate</button>
+    </form>
+</div>
 
         <!-- Laptop Inventory Table -->
         <div class="table-container mt-4">
-            <h4>Inventory List</h4>
+            <h4><b>Allocation List</b></h4>
             <table class="table table-striped">
                 <thead>
                     <tr>

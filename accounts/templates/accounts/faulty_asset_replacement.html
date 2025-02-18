@@ -95,7 +95,7 @@
 
     <div class="content">
         <h2><b>Faulty Asset Replacement</b></h2>
-
+        <br>
         <!-- Success/Error Messages -->
         {% if messages %} {% for message in messages %}
         <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %} alert-dismissible fade show" role="alert">
@@ -106,7 +106,7 @@
 
         <!-- Faulty Asset Replacement Form -->
         <div class="table-container">
-            <h4>Replace Faulty Asset</h4>
+            <h4><b>Replace Faulty Asset</b></h4>
             <form method="POST">
                 {% csrf_token %}
 
@@ -134,7 +134,7 @@
 
         <!-- Decommissioned Assets Table -->
         <div class="table-container mt-4">
-            <h4>Decommissioned Assets</h4>
+            <h4><b>Decommissioned Assets</b></h4>
         
             <!-- 🔹 Search Bar for Decommissioned Assets -->
             <form method="GET">

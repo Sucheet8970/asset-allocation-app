@@ -68,6 +68,8 @@ from .models import Inventory
 def inventory_view(request):
     search_query = request.GET.get("search", "").strip()  # ✅ Get search query
 
+    
+
     if search_query:
         laptops = Inventory.objects.filter(asset_host_name__icontains=search_query)  # ✅ Search by Asset Host Name
     else:
@@ -214,7 +216,7 @@ def export_inventory_to_excel(request):
 @login_required
 def new_allocation_view(request):
     available_laptops = Inventory.objects.filter(allocation_status__in=["Available", "Deallocated"])
-    allocated_laptops = Allocation.objects.select_related("laptop").all()  
+    allocated_laptops = Allocation.objects.select_related("laptop").all()
 
     if request.method == "POST":
         print("📩 Received Form Data:", request.POST)
@@ -222,6 +224,40 @@ def new_allocation_view(request):
         engineer_name = request.POST.get("engineer_name")
         email = request.POST.get("email")
         laptop_id = request.POST.get("laptop")
+
+        # Custodian Details
+        emp_id = request.POST.get("emp_id")
+        location = request.POST.get("location")
+        building = request.POST.get("building")
+        seat_no = request.POST.get("seat_no")
+        contact_no = request.POST.get("contact_no")
+        request_no = request.POST.get("request_no")
+        department = request.POST.get("department")
+        manager = request.POST.get("manager")
+
+        # Allocation Category
+        project_specific = request.POST.get("project_specific")
+
+        # Asset Category
+        laptop_category = request.POST.get("laptop_category")
+        other_assets = request.POST.get("other_assets", "")  # Optional
+
+        # Asset Allocation Type
+        short_term = request.POST.get("short_term")
+
+        # Hardware Details
+        manufacturer = request.POST.get("manufacturer")
+        processor = request.POST.get("processor")
+        adapter = request.POST.get("adapter")
+        asset_tag_number = request.POST.get("asset_tag_number")
+        ram_size = request.POST.get("ram_size")
+        mouse = request.POST.get("mouse")
+        serial_number = request.POST.get("serial_number")
+        model = request.POST.get("model")
+        hard_disk = request.POST.get("hard_disk")
+        bag = request.POST.get("bag")
+        battery_sl = request.POST.get("battery_sl")
+        other_description = request.POST.get("other_description", "")  # Optional
 
         if engineer_name and email and laptop_id:
             try:
@@ -231,7 +267,32 @@ def new_allocation_view(request):
                 allocation = Allocation.objects.create(
                     laptop=laptop,
                     engineer_name=engineer_name,
-                    email=email
+                    email=email,
+                    emp_id=emp_id,
+                    location=location,
+                    building=building,
+                    seat_no=seat_no,
+                    contact_no=contact_no,
+                    request_no=request_no,
+                    department=department,
+                    manager=manager,
+                    project_specific=project_specific,
+                    laptop_category=laptop_category,
+                    other_assets=other_assets,
+                    short_term=short_term,
+                    manufacturer=manufacturer,
+                    processor=processor,
+                    adapter=adapter,
+                    asset_tag_number=asset_tag_number,
+                    ram_size=ram_size,
+                    mouse=mouse,
+                    serial_number=serial_number,
+                    model=model,
+                    hard_disk=hard_disk,
+                    bag=bag,
+                    battery_sl=battery_sl,
+                    other_description=other_description,
+                    confirmed=False,  # Default confirmation status
                 )
 
                 # Mark laptop as allocated
@@ -242,7 +303,7 @@ def new_allocation_view(request):
 
                 send_allocation_email(allocation)
 
-                messages.success(request, "Laptop allocated successfully!")
+                messages.success(request, "Laptop allocated successfully! Email sent for confirmation.")
                 return redirect("new_allocation")
 
             except Inventory.DoesNotExist:
@@ -255,38 +316,66 @@ def new_allocation_view(request):
     })
 
 
-
+# Send Confirmation Email
 def send_allocation_email(allocation):
-    confirmation_url = f"http://127.0.0.1:8000/confirm-receipt/{allocation.id}/"
-    
-    subject = "Laptop Allocation Confirmation"
+    allocation_url = f"http://127.0.0.1:8000/confirm-receipt/{allocation.id}/"
+
+    subject = "Laptop Allocation Confirmation Required"
     message = f"""
 Dear {allocation.engineer_name},
 
 You have been allocated a laptop with the following details:
 
-- **Asset Host Name:** {allocation.laptop.asset_host_name}  ✅ FIXED: Access via `laptop`
+- **Asset Host Name:** {allocation.laptop.asset_host_name}
 - **Allocation Date:** {allocation.allocation_date}
 
 Please confirm the receipt of this laptop by clicking the link below:
 
-{confirmation_url}
+{allocation_url}
 
 Regards,  
 IT Team
 """
 
-    send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [allocation.email])
+    try:
+        send_mail(
+            subject,
+            message,
+            "sharathpatil333@gmail.com",
+            [allocation.email],  # ✅ Correct recipient email
+            fail_silently=False,
+        )
+        print("📩 Allocation email sent successfully!")
+    except Exception as e:
+        print("❌ Failed to send email:", str(e))  # ✅ Debugging
 
+# Confirmation Page (User clicks URL)
 @login_required
-def confirm_receipt(request, allocation_id):
-    allocation = get_object_or_404(Allocation, id=allocation_id)
-    
-    if not allocation.confirmed:
-        allocation.confirmed = True
-        allocation.save()
-    
-    return HttpResponse("<h2>✅ Thank you! Your receipt has been confirmed.</h2>")
+def confirm_receipt(request, id):
+    allocation = get_object_or_404(Allocation, id=id)  # ✅ Fetch correct object
+
+    # Update allocation status
+    allocation.confirmed = True
+    allocation.save(update_fields=["confirmed"])  # ✅ Efficient update
+
+    # Send confirmation email to engineer
+    subject = "Asset Receipt Confirmed"
+    message = f"Hello {allocation.engineer_name},\n\nThe asset with ID {allocation.laptop.id} has been confirmed.\n\nRegards,\nIT Team"
+
+    try:
+        send_mail(
+            subject,
+            message,
+            "allocation.email",
+            ["sharathpatil333@gmail.com"],  # ✅ Correct recipient
+            fail_silently=False,
+        )
+        print("📩 Confirmation email sent successfully!")
+    except Exception as e:
+        print("❌ Failed to send email:", str(e))  # ✅ Debugging
+
+    messages.success(request, "Asset receipt confirmed successfully!")
+    return render(request, "accounts/confirmation.html", {"allocation": allocation})
 
 '''-----------------------------------------------------------useless-------------------------------------------------------------------------------'''
 from django.shortcuts import render, get_object_or_404, redirect

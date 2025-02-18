@@ -46,8 +46,45 @@ class Allocation(models.Model):
     engineer_name = models.CharField(max_length=100)
     email = models.EmailField()
     allocated_on = models.DateTimeField(auto_now_add=True)
-    confirmed = models.BooleanField(default=False)  
+    confirmed = models.BooleanField(default=False)
     allocation_date = models.DateField(default=date.today)
+    user_confirmation_name = models.CharField(max_length=255, blank=True, null=True)
+ 
+
+    # Custodian Details
+    emp_id = models.CharField(max_length=50)
+    location = models.CharField(max_length=100)
+    building = models.CharField(max_length=100)
+    seat_no = models.CharField(max_length=50)
+    contact_no = models.CharField(max_length=50)
+    request_no = models.CharField(max_length=50)
+    department = models.CharField(max_length=100)
+    manager = models.CharField(max_length=100)
+
+    # Allocation Category
+    project_specific = models.CharField(max_length=100)
+
+    # Asset Category
+    laptop_category = models.CharField(max_length=100)
+    other_assets = models.CharField(max_length=100, blank=True, null=True)  # Optional
+
+    # Asset Allocation Type
+    short_term = models.CharField(max_length=50)
+
+    # Hardware Details
+    manufacturer = models.CharField(max_length=100)
+    processor = models.CharField(max_length=100)
+    adapter = models.CharField(max_length=100)
+    asset_tag_number = models.CharField(max_length=100)
+    ram_size = models.CharField(max_length=50)
+    mouse = models.CharField(max_length=50)
+    serial_number = models.CharField(max_length=100)
+    model = models.CharField(max_length=100)
+    hard_disk = models.CharField(max_length=100)
+    bag = models.CharField(max_length=50)
+    battery_sl = models.CharField(max_length=100)
+    other_description = models.TextField(blank=True, null=True)  # Optional
+   
 
     def __str__(self):
         return f"{self.engineer_name} - {self.laptop.asset_host_name}"

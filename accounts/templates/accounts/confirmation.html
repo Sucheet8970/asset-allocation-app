@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asset Declaration & Agreement Form</title>
+    {% load static %}
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: auto;
+            background-color: #fff;
+            padding:30px;
+            border: 1px solid #ccc;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header img {
+            width: 150px;
+        }
+        .header h2 {
+            margin-top: 10px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .section {
+            width: 100%;
+            margin-bottom: 20px;
+            padding: 5px;
+            padding-right: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .section-title {
+            font-weight: bold;
+            background-color: #ddd;
+            padding: 8px;
+            text-align: center;
+            font-size: 18px;
+            border-bottom: 2px solid #007bff;
+            margin-bottom: 15px;
+        }
+        .section-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .field {
+            flex: 1 1 32%;
+            min-width: 200px;
+        }
+        .field p {
+            margin: 5px 0;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-top: 20px;
+        }
+        form label, form input, form button {
+            margin-bottom: 15px;
+        }
+        form input {
+            padding: 10px;
+            width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        form button {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        form button:hover {
+            background-color: #0056b3;
+        }
+        .guidelines ul {
+            list-style-type: disc;
+            margin-left: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <img src="{% static 'images/static/images/Aequs-Logo-new.png' %}" alt="Company Logo">
+        <h2>Asset Declaration & Agreement Form</h2>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Custodian Details</div>
+        <div class="section-content">
+            <div class="field">
+                <p><strong>Employee ID:</strong> {{ allocation.emp_id }}</p>
+                <p><strong>Engineer Name:</strong> {{ allocation.engineer_name }}</p>
+                <p><strong>Email:</strong> {{ allocation.email }}</p>
+                <p><strong>Department:</strong> {{ allocation.department }}</p>
+            </div>
+            <div class="field">
+                <p><strong>Manager:</strong> {{ allocation.manager }}</p>
+                <p><strong>Location:</strong> {{ allocation.location }}</p>
+                <p><strong>Building:</strong> {{ allocation.building }}</p>
+                <p><strong>Seat Number:</strong> {{ allocation.seat_no }}</p>
+            </div>
+            <div class="field">
+                <p><strong>Contact Number:</strong> {{ allocation.contact_no }}</p>
+                <p><strong>Request Number:</strong> {{ allocation.request_no }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Allocation Category</div>
+        <div class="section-content">
+            <div class="field">
+                <p><strong>Project Specific:</strong> {{ allocation.project_specific }}</p>
+                <p><strong>Laptop Category:</strong> {{ allocation.laptop_category }}</p>
+            </div>
+            <div class="field">
+                <p><strong>Other Assets:</strong> {{ allocation.other_assets }}</p>
+                <p><strong>Short Term:</strong> {{ allocation.short_term }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Asset Details</div>
+        <div class="section-content">
+            <div class="field">
+                <p><strong>Laptop:</strong> {{ allocation.laptop }}</p>
+                <p><strong>Manufacturer:</strong> {{ allocation.manufacturer }}</p>
+                <p><strong>Processor:</strong> {{ allocation.processor }}</p>
+            </div>
+            <div class="field">
+                <p><strong>Adapter:</strong> {{ allocation.adapter }}</p>
+                <p><strong>Asset Tag Number:</strong> {{ allocation.asset_tag_number }}</p>
+                <p><strong>RAM Size:</strong> {{ allocation.ram_size }}</p>
+            </div>
+            <div class="field">
+                <p><strong>Mouse:</strong> {{ allocation.mouse }}</p>
+                <p><strong>Serial Number:</strong> {{ allocation.serial_number }}</p>
+                <p><strong>Model:</strong> {{ allocation.model }}</p>
+            </div>
+            <div class="field">
+                <p><strong>Hard Disk:</strong> {{ allocation.hard_disk }}</p>
+                <p><strong>Bag:</strong> {{ allocation.bag }}</p>
+                <p><strong>Battery Serial:</strong> {{ allocation.battery_sl }}</p>
+            </div>
+            <div class="field">
+                <p><strong>Other Description:</strong> {{ allocation.other_description }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Agreement for Using Company Computer/Mobile Computer</div>
+        <p>I, <strong>{{ allocation.engineer_name }}</strong>, undersigned, understand that the Computer/Mobile loaned to me by Aequs is to be used for company-related business only. It is not to be used by anyone except myself. I also understand that I should not install software and/or hardware without authorization.</p>
+        <p>I agree to return all hardware and/or software to the company on the specified date or upon request by the IT department. I understand that I am responsible for any theft or physical damage to the assigned Mobile/Computer and will bear the charges for the same.</p>
+    </div>
+
+    <div class="section guidelines">
+        <div class="section-title">Laptop User Guidelines</div>
+        <ul>
+            <li>Antivirus/windows firewall should not be disabled for any reason.</li>
+            <li>Do not interrupt virus scanning; keep virus definitions up to date.</li>
+            <li>If a virus is found, report it to IT and avoid connecting the laptop to the network.</li>
+            <li>Avoid storing data on the desktop.</li>
+            <li>Do not copy video/audio files into the backup directory.</li>
+            <li>Do not place files on the C:\ drive; it is dedicated to the operating system.</li>
+            <li>Store all data in the Share folder (AQ-FS01); data outside will not be backed up.</li>
+            <li>Do not install personal/freeware/unauthorized software.</li>
+            <li>Lock the workstation before leaving the desk.</li>
+            <li>Sharing drives or folders with others is restricted.</li>
+            <li>Be cautious about laptop/mobile/data card theft, especially while traveling.</li>
+            <li>Report stolen/lost laptops to the police and provide the FIR number to IT.</li>
+            <li>Always carry the laptop in a laptop bag, not in luggage bags.</li>
+            <li>Do not leave the laptop at the office overnight.</li>
+            <li>Change passwords regularly (every 30 days).</li>
+            <li>Avoid placing laptops on beds or pillows to prevent overheating.</li>
+            <li>Only connect to authorized wireless networks within Aequs.</li>
+            <li>Ensure public Wi-Fi connections are secure before connecting.</li>
+            <li>For onsite travel over 30 days, contact IT for local server configuration.</li>
+        </ul>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+        <label for="user_confirmation_name">Enter Full Name:</label>
+        <input type="text" name="user_confirmation_name" required>
+        <button type="submit">Submit</button>
+    </form>
+</div>
+
+</body>
+</html>
