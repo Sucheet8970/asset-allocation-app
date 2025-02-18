@@ -9,6 +9,9 @@ from django.urls import reverse
 from .models import Inventory, Laptop, Allocation, Deallocation 
 from django.contrib.auth.decorators import user_passes_test
 import pandas as pd
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+
 
 '''--------------------------------------------------------------LOGIN------------------------------------------------------------------------------'''
 # User Authentication Views
@@ -352,30 +355,39 @@ IT Team
 # Confirmation Page (User clicks URL)
 @login_required
 def confirm_receipt(request, id):
-    allocation = get_object_or_404(Allocation, id=id)  # ✅ Fetch correct object
+    allocation = get_object_or_404(Allocation, id=id)  # ✅ Fetch allocation
 
-    # Update allocation status
-    allocation.confirmed = True
-    allocation.save(update_fields=["confirmed"])  # ✅ Efficient update
+    if request.method == "POST":
+        # Update allocation status
+        allocation.confirmed = True
+        allocation.save(update_fields=["confirmed"])
 
-    # Send confirmation email to engineer
-    subject = "Asset Receipt Confirmed"
-    message = f"Hello {allocation.engineer_name},\n\nThe asset with ID {allocation.laptop.id} has been confirmed.\n\nRegards,\nIT Team"
+        # Email details
+        subject = "Asset Receipt Confirmed"
+        message = f"Hello,\n\nThe asset with ID {allocation.laptop.id} has been confirmed.\n\nRegards,\nIT Team"
+        
+        sender_email = allocation.email  # ✅ Fetch sender email from Allocation table
+        receiver_email = "sharathpatil333@gmail.com"  # ✅ Fixed receiver email
+        
+        try:
+            # Use Django's EmailMessage for better control
+            email = email(
+                subject=subject,
+                body=message,
+                from_email=sender_email,  # ✅ Dynamic sender (may not work with all SMTPs)
+                to=[receiver_email],  # ✅ Receiver
+            )
+            email.send(fail_silently=False)
+            print("📩 Confirmation email sent successfully!")
 
-    try:
-        send_mail(
-            subject,
-            message,
-            "allocation.email",
-            ["sharathpatil333@gmail.com"],  # ✅ Correct recipient
-            fail_silently=False,
-        )
-        print("📩 Confirmation email sent successfully!")
-    except Exception as e:
-        print("❌ Failed to send email:", str(e))  # ✅ Debugging
+        except Exception as e:
+            print(f"❌ Failed to send email: {str(e)}")  # ✅ Debugging
+            messages.error(request, f"Failed to send email: {str(e)}")  # ✅ User feedback
 
-    messages.success(request, "Asset receipt confirmed successfully!")
+        messages.success(request, "Asset receipt confirmed successfully!")
+
     return render(request, "accounts/confirmation.html", {"allocation": allocation})
+
 
 '''-----------------------------------------------------------useless-------------------------------------------------------------------------------'''
 from django.shortcuts import render, get_object_or_404, redirect

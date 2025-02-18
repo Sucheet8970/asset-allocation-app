@@ -17,4 +17,5 @@ urlpatterns = [
     path('deallocation/', asset_deallocation, name='asset_deallocation'),  # Fixed URL to match error
     path('confirmation/<int:allocation_id>/', send_allocation_email, name='confirm_allocation'),
     path("confirm-receipt/<int:id>/", confirm_receipt, name="confirm_receipt"),
+    
 ]
