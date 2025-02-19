@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import (
-    login_view, dashboard_view, logout_view, inventory_view, new_allocation_view, confirm_receipt, generate_pdf,
+    login_view, dashboard_view, logout_view, inventory_view, new_allocation_view, confirm_receipt,
     faulty_asset_replacement_view, repair_asset_view, update_license_status, asset_deallocation, export_inventory_to_excel, send_allocation_email
 )
 

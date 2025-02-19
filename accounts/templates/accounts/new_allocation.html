@@ -121,7 +121,7 @@
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label class="form-label">Select Laptop</label>
-                <select class="form-control" name="laptop">
+                <select class="form-control" name="laptop" >
                     <option value="">Select a Laptop</option>
                     {% for laptop in available_laptops %}
                         <option value="{{ laptop.id }}">{{ laptop.asset_host_name }}</option>
@@ -137,44 +137,44 @@
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label class="form-label">Employee ID</label>
-                <input type="text" class="form-control" name="emp_id">
+                <input type="text" class="form-control" name="emp_id" required>
             </div>
             <div class="col-md-6 mb-3">
                 <label class="form-label">Location</label>
-                <input type="text" class="form-control" name="location">
+                <input type="text" class="form-control" name="location" required>
             </div>
         </div>
         
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label class="form-label">Building</label>
-                <input type="text" class="form-control" name="building">
+                <input type="text" class="form-control" name="building" required>
             </div>
             <div class="col-md-6 mb-3">
                 <label class="form-label">Seat </label>
-                <input type="text" class="form-control" name="seat_no">
+                <input type="text" class="form-control" name="seat_no" required>
             </div>
         </div>
 
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label class="form-label">Contact </label>
-                <input type="text" class="form-control" name="contact_no">
+                <input type="text" class="form-control" name="contact_no" required>
             </div>
             <div class="col-md-6 mb-3">
                 <label class="form-label">Request </label>
-                <input type="text" class="form-control" name="request_no">
+                <input type="text" class="form-control" name="request_no" required>
             </div>
         </div>
 
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label class="form-label">Department</label>
-                <input type="text" class="form-control" name="department">
+                <input type="text" class="form-control" name="department" required>
             </div>
             <div class="col-md-6 mb-3">
                 <label class="form-label">Manager</label>
-                <input type="text" class="form-control" name="manager">
+                <input type="text" class="form-control" name="manager" required>
             </div>
         </div>
 
@@ -183,7 +183,7 @@
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label class="form-label">Project Specific</label>
-                <input type="text" class="form-control" name="project_specific">
+                <input type="text" class="form-control" name="project_specific" required>
             </div>
         </div>
 
@@ -192,7 +192,7 @@
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label class="form-label">Laptop</label>
-                <input type="text" class="form-control" name="laptop_category">
+                <input type="text" class="form-control" name="laptop_category" required>
             </div>
             <div class="col-md-6 mb-3">
                 <label class="form-label">Others (Optional)</label>
@@ -205,7 +205,7 @@
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label class="form-label">Short Term</label>
-                <input type="text" class="form-control" name="short_term">
+                <input type="text" class="form-control" name="short_term" required>
             </div>
         </div>
 
@@ -214,29 +214,29 @@
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label class="form-label">Manufacturer</label>
-                <input type="text" class="form-control" name="manufacturer">
+                <input type="text" class="form-control" name="manufacturer" required>
             </div>
             <div class="col-md-6 mb-3">
                 <label class="form-label">Processor</label>
-                <input type="text" class="form-control" name="processor">
+                <input type="text" class="form-control" name="processor" required>
             </div>
         </div>
 
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label class="form-label">Adapter</label>
-                <input type="text" class="form-control" name="adapter">
+                <input type="text" class="form-control" name="adapter" >
             </div>
             <div class="col-md-6 mb-3">
                 <label class="form-label">Asset Tag Number</label>
-                <input type="text" class="form-control" name="asset_tag_number">
+                <input type="text" class="form-control" name="asset_tag_number" required>
             </div>
         </div>
 
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label class="form-label">RAM Size</label>
-                <input type="text" class="form-control" name="ram_size">
+                <input type="text" class="form-control" name="ram_size" required>
             </div>
             <div class="col-md-6 mb-3">
                 <label class="form-label">Mouse</label>
@@ -247,18 +247,18 @@
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label class="form-label">Serial </label>
-                <input type="text" class="form-control" name="serial_number">
+                <input type="text" class="form-control" name="serial_number" required>
             </div>
             <div class="col-md-6 mb-3">
                 <label class="form-label">Model</label>
-                <input type="text" class="form-control" name="model">
+                <input type="text" class="form-control" name="model" required>
             </div>
         </div>
 
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label class="form-label">Hard Disk</label>
-                <input type="text" class="form-control" name="hard_disk">
+                <input type="text" class="form-control" name="hard_disk" required>
             </div>
             <div class="col-md-6 mb-3">
                 <label class="form-label">Bag</label>
