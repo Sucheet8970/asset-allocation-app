@@ -11,6 +11,10 @@ from django.contrib.auth.decorators import user_passes_test
 import pandas as pd
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
+from django.template.loader import get_template
+import pdfkit
+from django.template.loader import render_to_string, get_template
+
 
 
 '''--------------------------------------------------------------LOGIN------------------------------------------------------------------------------'''
