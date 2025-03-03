@@ -14,6 +14,14 @@ from reportlab.pdfgen import canvas
 from django.template.loader import get_template
 import pdfkit
 from django.template.loader import render_to_string, get_template
+import csv
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.pagesizes import A4
+from weasyprint import HTML
+import tempfile
+import os
 
 
 
@@ -39,6 +47,14 @@ def dashboard_view(request):
     confirmed_allocations = Allocation.objects.filter(confirmed=True).count()
     pending_confirmations = Allocation.objects.filter(confirmed=False).count()
 
+    # ✅ Count the number of laptops where all licenses are confirmed
+    confirmed_licenses = Inventory.objects.filter(
+        sophos_status="Confirmed",
+        patch_manager_status="Confirmed",
+        sase_proxy_status="Confirmed",
+        summit_status="Confirmed"
+    ).count()
+
     # ✅ Fetch allocations with related laptop data
     asset_data = Allocation.objects.select_related("laptop").values(
         "id", 
@@ -57,6 +73,7 @@ def dashboard_view(request):
         "total_laptops": total_laptops,
         "confirmed_allocations": confirmed_allocations,
         "pending_confirmations": pending_confirmations,
+        "confirmed_licenses": confirmed_licenses,  # ✅ New context variable for confirmed licenses
         "asset_data": asset_data
     }
     return render(request, "accounts/dashboard.html", context)
@@ -217,6 +234,7 @@ def export_inventory_to_excel(request):
         df.to_excel(writer, sheet_name="Inventory", index=False)
 
     return response
+
 
 '''-----------------------------------------------------------------------------new_allocation-----------------------------------------------------------------------------------------'''
 # Laptop Allocation
@@ -392,6 +410,52 @@ def confirm_receipt(request, id):
 
     return render(request, "accounts/confirmation.html", {"allocation": allocation})
 
+def export_allocations_to_excel(request):
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = 'attachment; filename="allocations.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow([
+        "Engineer Name", "Email", "Laptop", "Allocated On", "Confirmed", "User Confirmation Name",
+        "Emp ID", "Location", "Building", "Seat No", "Contact No", "Request No",
+        "Department", "Manager", "Project", "Laptop Category", "Other Assets",
+        "Short Term", "Manufacturer", "Processor", "Adapter", "Asset Tag", "RAM Size",
+        "Mouse", "Serial No", "Model", "Hard Disk", "Bag", "Battery SL", "Other Description"
+    ])
+
+    allocations = Allocation.objects.all()
+    for allocation in allocations:
+        writer.writerow([
+            allocation.engineer_name, allocation.email, allocation.laptop.asset_host_name, allocation.allocated_on,
+            allocation.confirmed, allocation.user_confirmation_name, allocation.emp_id, allocation.location,
+            allocation.building, allocation.seat_no, allocation.contact_no, allocation.request_no,
+            allocation.department, allocation.manager, allocation.project_specific,
+            allocation.laptop_category, allocation.other_assets, allocation.short_term,
+            allocation.manufacturer, allocation.processor, allocation.adapter, allocation.asset_tag_number,
+            allocation.ram_size, allocation.mouse, allocation.serial_number, allocation.model,
+            allocation.hard_disk, allocation.bag, allocation.battery_sl, allocation.other_description
+        ])
+
+    return response
+
+def generate_pdf(request, allocation_id):
+    allocation = get_object_or_404(Allocation, id=allocation_id)
+
+    # Load the HTML template
+    template = get_template('accounts/confirmation.html')
+    html_content = template.render({'allocation': allocation})
+
+    # Define the file path
+    pdf_path = os.path.join(settings.MEDIA_ROOT, f'Asset_Declaration_{allocation_id}.pdf')
+
+    # Generate PDF
+    HTML(string=html_content).write_pdf(pdf_path)
+
+    # Serve the PDF file
+    with open(pdf_path, 'rb') as pdf_file:
+        response = HttpResponse(pdf_file.read(), content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="Asset_Declaration_{allocation_id}.pdf"'
+        return response
 
 '''-----------------------------------------------------------useless-------------------------------------------------------------------------------'''
 from django.shortcuts import render, get_object_or_404, redirect

@@ -278,6 +278,7 @@
         </div>
 
         <button type="submit" class="btn btn-primary">Allocate</button>
+        <a href="{% url 'export_allocations' %}" class="btn btn-success">Download Allocations</a>
     </form>
 </div>
 
@@ -309,7 +310,8 @@
                         <td><b style="color: blue;">Allocated</b></td>
                         <td>
                             {% if allocation.confirmed %}
-                            <span style="color: green; font-weight: bold;">✅ Confirmed</span> {% else %}
+                            <span style="color: green; font-weight: bold;">✅ Confirmed</span>
+                            <a href="{% url 'generate_pdf' allocation.id %}" class="btn btn-primary">Download Form</a> {% else %}
                             <span style="color: orange; font-weight: bold;">⏳ Pending</span> {% endif %}
                         </td>
                     </tr>

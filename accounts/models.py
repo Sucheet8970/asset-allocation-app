@@ -84,6 +84,7 @@ class Allocation(models.Model):
     bag = models.CharField(max_length=50)
     battery_sl = models.CharField(max_length=100)
     other_description = models.TextField(blank=True, null=True)  # Optional
+    engineer_department = models.CharField(max_length=100, blank=True, null=True)
    
 
     def __str__(self):
