@@ -99,13 +99,18 @@
             list-style-type: disc;
             margin-left: 20px;
         }
+
+        input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        margin-left: 10px;
+    }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header">
-        <img src="{% static 'images\Aequs-Logo-new.png' %}" alt="Company Logo">
         <h2>Asset Declaration & Agreement Form</h2>
     </div>
 
@@ -216,14 +221,15 @@
     <form method="POST">
         {% csrf_token %}
         
-        <label for="agreement" style="display: inline-flex; ">
+        <label for="agreement" style="display: inline-flex;">
             I agree to the terms and conditions outlined in the agreement.
-            <input type="checkbox" id="agreement" required>
-          </label>
-          
-        <label for="user_confirmation_name">Enter Full Name:</label>
-        <input type="text" name="user_confirmation_name" required>
-        <button type="submit">Submit</button>
+            <input type="checkbox" id="agreement" required checked>
+        </label>
+
+        <label for="user_confirmation_name">Enter Your Name(Same as in the documents):</label>
+        <p><strong>{{ allocation.engineer_name }}</strong></p>
+        <input type="hidden" name="user_confirmation_name" value="{{ allocation.engineer_name }}">
+        
         
     </form>
 

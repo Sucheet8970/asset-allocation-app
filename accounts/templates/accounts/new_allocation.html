@@ -106,10 +106,10 @@
         {% csrf_token %}
 
         <!-- Engineer Details -->
-        <h5><b>Engineer Details</b></h5>
+        <h5><b>Employee Details</b></h5>
         <div class="row">
             <div class="col-md-6 mb-3">
-                <label class="form-label">Engineer Name</label>
+                <label class="form-label">Employee Name</label>
                 <input type="text" class="form-control" name="engineer_name" required>
             </div>
             <div class="col-md-6 mb-3">
@@ -268,7 +268,7 @@
 
         <div class="row">
             <div class="col-md-6 mb-3">
-                <label class="form-label">Battery SL</label>
+                <label class="form-label">SIM</label>
                 <input type="text" class="form-control" name="battery_sl">
             </div>
             <div class="col-md-6 mb-3">
@@ -290,7 +290,7 @@
                     <tr>
                         <th>Sl No.</th>
                         <th>Asset Host Name</th>
-                        <th>Engineer Name</th>
+                        <th>Employee Name</th>
                         <th>Email</th>
                         <th>Allocated Date</th>
                         <th>Allocation Status</th>
@@ -310,10 +310,16 @@
                         <td><b style="color: blue;">Allocated</b></td>
                         <td>
                             {% if allocation.confirmed %}
-                            <span style="color: green; font-weight: bold;">✅ Confirmed</span>
-                            <a href="{% url 'generate_pdf' allocation.id %}" class="btn btn-primary">Download Form</a> {% else %}
-                            <span style="color: orange; font-weight: bold;">⏳ Pending</span> {% endif %}
+                                <span style="color: green; font-weight: bold;">✅ Confirmed</span>
+                                <a href="{% url 'generate_pdf' allocation.id %}" class="btn btn-primary btn-sm">
+                                    <i class="fa fa-download"></i>
+                                </a>
+                            {% else %}
+                                <span style="color: orange; font-weight: bold;">⏳ Pending</span>
+                            {% endif %}
                         </td>
+                        
+                        
                     </tr>
                     {% empty %}
                     <tr>

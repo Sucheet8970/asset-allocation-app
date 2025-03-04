@@ -442,7 +442,7 @@ def generate_pdf(request, allocation_id):
     allocation = get_object_or_404(Allocation, id=allocation_id)
 
     # Load the HTML template
-    template = get_template('accounts/confirmation.html')
+    template = get_template('accounts/download.html')
     html_content = template.render({'allocation': allocation})
 
     # Define the file path
