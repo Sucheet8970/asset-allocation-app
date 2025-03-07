@@ -9,6 +9,9 @@
     <!-- Bootstrap & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
 
     <style>
         body {
@@ -121,7 +124,7 @@
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label class="form-label">Select Laptop</label>
-                <select class="form-control" name="laptop" >
+                <select class="form-control select2" name="laptop">
                     <option value="">Select a Laptop</option>
                     {% for laptop in available_laptops %}
                         <option value="{{ laptop.id }}">{{ laptop.asset_host_name }}</option>
@@ -131,6 +134,16 @@
                 </select>
             </div>
         </div>
+        
+        <!-- Initialize Select2 -->
+        <script>
+            $(document).ready(function() {
+                $('.select2').select2({
+                    placeholder: "Select a Laptop",
+                    allowClear: true
+                });
+            });
+        </script>
 
         <!-- Custodian Details -->
         <h5><b>Custodian Details</b></h5>
@@ -178,36 +191,46 @@
             </div>
         </div>
 
-        <!-- Allocation Category -->
-        <h5><b>Allocation Category</b></h5>
         <div class="row">
+            <!-- Asset Category (Left Side) -->
             <div class="col-md-6 mb-3">
+                <h5><b>Asset Category</b></h5>
+                <label class="form-label">Select Asset Category</label>
+                <select class="form-control" name="asset_category" required>
+                    <option value="">Select an Asset</option>
+                    <option value="Laptop">Laptop</option>
+                    <option value="Desktop">Desktop</option>
+                    <option value="Tablet">Tablet</option>
+                </select>
+            </div>
+        
+            <!-- Allocation Category (Right Side) -->
+            <div class="col-md-6 mb-3">
+                <h5><b>Allocation Category</b></h5>
                 <label class="form-label">Project Specific</label>
-                <input type="text" class="form-control" name="project_specific" required>
+                <select class="form-control" name="project_specific" required>
+                    <option value="">Select an Option</option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                </select>
             </div>
         </div>
+        
 
-        <!-- Asset Category -->
-        <h5><b>Asset Category</b></h5>
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label class="form-label">Laptop</label>
-                <input type="text" class="form-control" name="laptop_category" required>
-            </div>
-            <div class="col-md-6 mb-3">
-                <label class="form-label">Others (Optional)</label>
-                <input type="text" class="form-control" name="other_assets">
-            </div>
-        </div>
 
-        <!-- Asset Allocation Type -->
-        <h5><b>Asset Allocation Type</b></h5>
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label class="form-label">Short Term</label>
-                <input type="text" class="form-control" name="short_term" required>
-            </div>
-        </div>
+     <!-- Asset Allocation Type -->
+<h5><b>Asset Allocation Type</b></h5>
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <label class="form-label">Short Term</label>
+        <select class="form-control" name="short_term" required>
+            <option value="">Select an Option</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+        </select>
+    </div>
+</div>
+
 
         <!-- Hardware Details -->
         <h5><b>Hardware Details</b></h5>
@@ -236,11 +259,20 @@
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label class="form-label">RAM Size</label>
-                <input type="text" class="form-control" name="ram_size" required>
+                <select class="form-control" name="short_term" required>
+                    <option value="">Select an Option</option>
+                    <option value="8">8</option>
+                    <option value="16">16</option>
+                    <option value="32">32</option>
+                </select>
             </div>
             <div class="col-md-6 mb-3">
                 <label class="form-label">Mouse</label>
-                <input type="text" class="form-control" name="mouse">
+                <select class="form-control" name="Mouse" required>
+                    <option value="">Select an Option</option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                </select>
             </div>
         </div>
 
@@ -262,7 +294,11 @@
             </div>
             <div class="col-md-6 mb-3">
                 <label class="form-label">Bag</label>
-                <input type="text" class="form-control" name="bag">
+                <select class="form-control" name="Bag" required>
+                    <option value="">Select an Option</option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                </select>
             </div>
         </div>
 
@@ -282,59 +318,73 @@
     </form>
 </div>
 
-        <!-- Laptop Inventory Table -->
-        <div class="table-container mt-4">
-            <h4><b>Allocation List</b></h4>
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Sl No.</th>
-                        <th>Asset Host Name</th>
-                        <th>Employee Name</th>
-                        <th>Email</th>
-                        <th>Allocated Date</th>
-                        <th>Allocation Status</th>
-                        <th>Email Status</th>
-                        <!-- Confirmed or Pending -->
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for allocation in allocated_laptops %}
-                    <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td>{{ allocation.laptop.asset_host_name }}</td>
-                        <!-- ✅ Fetch from related Inventory -->
-                        <td>{{ allocation.engineer_name }}</td>
-                        <td>{{ allocation.email }}</td>
-                        <td>{{ allocation.allocation_date}}</td>
-                        <td><b style="color: blue;">Allocated</b></td>
-                        <td>
-                            {% if allocation.confirmed %}
-                                <span style="color: green; font-weight: bold;">✅ Confirmed</span>
-                                <a href="{% url 'generate_pdf' allocation.id %}" class="btn btn-primary btn-sm">
-                                    <i class="fa fa-download"></i>
-                                </a>
-                            {% else %}
-                                <span style="color: orange; font-weight: bold;">⏳ Pending</span>
-                            {% endif %}
-                        </td>
-                        
-                        
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="6">No allocations yet.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
 
+<!-- Laptop Inventory Table -->
+<div class="table-container mt-4">
+    <h4><b>Allocation List</b></h4>
+
+          <!-- Search Box -->
+<div class="row">
+    <div class="col-md-4">
+        <input type="text" id="searchInput" class="form-control" placeholder="Search by Asset Host Name...">
     </div>
+</div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <table class="table table-striped" id="allocationTable">
+        <thead>
+            <tr>
+                <th>Sl No.</th>
+                <th>Asset Host Name</th>
+                <th>Employee Name</th>
+                <th>Email</th>
+                <th>Allocated Date</th>
+                <th>Allocation Status</th>
+                <th>Email Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for allocation in allocated_laptops %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td class="asset-host-name">{{ allocation.laptop.asset_host_name }}</td>
+                <td>{{ allocation.engineer_name }}</td>
+                <td>{{ allocation.email }}</td>
+                <td>{{ allocation.allocation_date}}</td>
+                <td><b style="color: blue;">Allocated</b></td>
+                <td>
+                    {% if allocation.confirmed %}
+                        <span style="color: green; font-weight: bold;">✅ Confirmed</span>
+                        <a href="{% url 'generate_pdf' allocation.id %}" class="btn btn-primary btn-sm">
+                            <i class="fa fa-download"></i>
+                        </a>
+                    {% else %}
+                        <span style="color: orange; font-weight: bold;">⏳ Pending</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7">No allocations yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Search Functionality -->
+<script>
+    document.getElementById("searchInput").addEventListener("keyup", function () {
+        let filter = this.value.toLowerCase();
+        let rows = document.querySelectorAll("#allocationTable tbody tr");
+
+        rows.forEach(row => {
+            let assetHostName = row.querySelector(".asset-host-name").textContent.toLowerCase();
+            row.style.display = assetHostName.includes(filter) ? "" : "none";
+        });
+    });
+</script>
 </body>
-
 </html>
