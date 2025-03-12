@@ -22,6 +22,8 @@ from reportlab.lib.pagesizes import A4
 from weasyprint import HTML
 import tempfile
 import os
+from django.shortcuts import render
+from django.db import connection
 
 
 
@@ -234,6 +236,8 @@ def export_inventory_to_excel(request):
         df.to_excel(writer, sheet_name="Inventory", index=False)
 
     return response
+
+'''-----------------------------------------------------------------------------dropdown menu-----------------------------------------------------------------------------------------'''
 
 
 '''-----------------------------------------------------------------------------new_allocation-----------------------------------------------------------------------------------------'''

@@ -127,13 +127,16 @@
                 <select class="form-control select2" name="laptop">
                     <option value="">Select a Laptop</option>
                     {% for laptop in available_laptops %}
-                        <option value="{{ laptop.id }}">{{ laptop.asset_host_name }}</option>
+                        {% if laptop.license_status == "Active" %}
+                            <option value="{{ laptop.id }}">{{ laptop.asset_host_name }}</option>
+                        {% endif %}
                     {% empty %}
                         <option disabled>No available laptops</option>
                     {% endfor %}
                 </select>
             </div>
         </div>
+        
         
         <!-- Initialize Select2 -->
         <script>
@@ -196,7 +199,7 @@
             <div class="col-md-6 mb-3">
                 <h5><b>Asset Category</b></h5>
                 <label class="form-label">Select Asset Category</label>
-                <select class="form-control" name="asset_category" required>
+                <select class="form-control" name="laptop_category" required>
                     <option value="">Select an Asset</option>
                     <option value="Laptop">Laptop</option>
                     <option value="Desktop">Desktop</option>
@@ -259,7 +262,7 @@
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label class="form-label">RAM Size</label>
-                <select class="form-control" name="short_term" required>
+                <select class="form-control" name="ram_size" required>
                     <option value="">Select an Option</option>
                     <option value="8">8</option>
                     <option value="16">16</option>
@@ -268,7 +271,7 @@
             </div>
             <div class="col-md-6 mb-3">
                 <label class="form-label">Mouse</label>
-                <select class="form-control" name="Mouse" required>
+                <select class="form-control" name="mouse" required>
                     <option value="">Select an Option</option>
                     <option value="Yes">Yes</option>
                     <option value="No">No</option>
@@ -294,7 +297,7 @@
             </div>
             <div class="col-md-6 mb-3">
                 <label class="form-label">Bag</label>
-                <select class="form-control" name="Bag" required>
+                <select class="form-control" name="bag" required>
                     <option value="">Select an Option</option>
                     <option value="Yes">Yes</option>
                     <option value="No">No</option>

@@ -62,26 +62,26 @@ class Allocation(models.Model):
     manager = models.CharField(max_length=100)
 
     # Allocation Category
-    project_specific = models.CharField(max_length=100)
+    project_specific = models.CharField(max_length=100, null=True, blank=True)
 
     # Asset Category
     laptop_category = models.CharField(max_length=100)
     other_assets = models.CharField(max_length=100, blank=True, null=True)  # Optional
 
     # Asset Allocation Type
-    short_term = models.CharField(max_length=50)
+    short_term = models.CharField(max_length=50, null=True, blank=True)
 
     # Hardware Details
     manufacturer = models.CharField(max_length=100)
     processor = models.CharField(max_length=100)
     adapter = models.CharField(max_length=100)
     asset_tag_number = models.CharField(max_length=100)
-    ram_size = models.CharField(max_length=50)
-    mouse = models.CharField(max_length=50)
+    ram_size = models.CharField(max_length=50, null=True, blank=True)
+    mouse = models.CharField(max_length=50, null=True, blank=True)
     serial_number = models.CharField(max_length=100)
     model = models.CharField(max_length=100)
     hard_disk = models.CharField(max_length=100)
-    bag = models.CharField(max_length=50)
+    bag = models.CharField(max_length=50, null=True, blank=True)
     battery_sl = models.CharField(max_length=100)
     other_description = models.TextField(blank=True, null=True)  # Optional
     engineer_department = models.CharField(max_length=100, blank=True, null=True)
