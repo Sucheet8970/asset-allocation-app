@@ -73,7 +73,7 @@ class Allocation(models.Model):
 
     # Hardware Details
     manufacturer = models.CharField(max_length=100)
-    processor = models.CharField(max_length=100)
+    processor = models.CharField(max_length=100, null=True, blank=True)
     adapter = models.CharField(max_length=100)
     asset_tag_number = models.CharField(max_length=100)
     ram_size = models.CharField(max_length=50, null=True, blank=True)
@@ -102,3 +102,7 @@ class Deallocation(models.Model):
 
     def __str__(self):
         return f"{self.laptop.asset_host_name} - Deallocated"
+    
+
+    
+    

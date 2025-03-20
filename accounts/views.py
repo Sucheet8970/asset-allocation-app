@@ -84,6 +84,7 @@ def logout_view(request):
     logout(request)
     return redirect('login')
 
+
 # Inventory Management
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
@@ -237,7 +238,7 @@ def export_inventory_to_excel(request):
 
     return response
 
-'''-----------------------------------------------------------------------------dropdown menu-----------------------------------------------------------------------------------------'''
+
 
 
 '''-----------------------------------------------------------------------------new_allocation-----------------------------------------------------------------------------------------'''
@@ -585,5 +586,70 @@ def asset_deallocation(request):
         "allocated_assets": allocated_assets,
         "deallocated_assets": deallocated_assets,  # Pass to template
     })
+
+'''------------------------------------------------------------stats------------------------------------------------------------------------------'''
+
+from django.shortcuts import render
+from django.db.models import Count
+from .models import Inventory
+from datetime import datetime
+import json
+
+def statistics_page(request):
+    # Get selected month from request (if available)
+    selected_month = request.GET.get('month')
+    
+    # Filter records by month if selected
+    if selected_month:
+        month_filter = datetime.strptime(selected_month, "%Y-%m").month
+        year_filter = datetime.strptime(selected_month, "%Y-%m").year
+        laptops = Inventory.objects.filter(allocation_status="Allocated", allocation__allocation_date__month=month_filter, allocation__allocation_date__year=year_filter)
+        deallocated_laptops = Inventory.objects.filter(allocation_status="Deallocated", deallocation__deallocation_date__month=month_filter, deallocation__deallocation_date__year=year_filter)
+        faulty_laptops = Inventory.objects.filter(allocation_status="Decommissioned", replaced_with__isnull=False)
+    else:
+        laptops = Inventory.objects.filter(allocation_status="Allocated")
+        deallocated_laptops = Inventory.objects.filter(allocation_status="Deallocated")
+        faulty_laptops = Inventory.objects.filter(allocation_status="Decommissioned", replaced_with__isnull=False)
+
+    # Count total values
+    stats_data = {
+        "Allocated": laptops.count(),
+        "Deallocated": deallocated_laptops.count(),
+        "Faulty": faulty_laptops.count()
+    }
+
+    return render(request, "accounts/statistics.html", {"stats_data": json.dumps(stats_data), "selected_month": selected_month})
+
+from django.http import HttpResponse
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+
+def download_statistics_pdf(request):
+    selected_month = request.GET.get("month", "All Time")
+    
+    # Fetch statistics again
+    allocated = Inventory.objects.filter(allocation_status="Allocated").count()
+    deallocated = Inventory.objects.filter(allocation_status="Decommissioned").count()
+    faulty = Inventory.objects.filter(allocation_status="Faulty", replaced_with__isnull=False).count()
+
+    stats_data = {
+        "Allocated": allocated,
+        "Deallocated": deallocated,
+        "Faulty": faulty
+    }
+
+    # Render HTML template for PDF
+    template = get_template("accounts/statistics_pdf.html")
+    html = template.render({"stats_data": stats_data, "selected_month": selected_month})
+
+    # Generate PDF
+    response = HttpResponse(content_type="application/pdf")
+    response["Content-Disposition"] = 'attachment; filename="laptop_statistics.pdf"'
+    pisa_status = pisa.CreatePDF(html, dest=response)
+
+    if pisa_status.err:
+        return HttpResponse("Error generating PDF", status=500)
+    
+    return response
 
 

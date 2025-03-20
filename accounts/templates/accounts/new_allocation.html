@@ -93,6 +93,7 @@
         <a href="{% url 'new_allocation' %}" class="active"><i class="fa-solid fa-user-plus"></i> New Allocation</a>
         <a href="{% url 'asset_deallocation' %}" class="active"><i class="fa-solid fa-user-minus"></i> Deallocation</a>
         <a href="{% url 'faulty_asset_replacement' %}"><i class="fa-solid fa-exclamation-triangle"></i> Faulty Asset Replacement</a>
+        <a href="{% url 'statistics' %}" class="active"><i class="fa-solid fa-chart-pie"></i> Statistics</a>
         <a href="{% url 'logout' %}"><i class="fa-solid fa-sign-out-alt"></i> Logout</a>
     </div>
 
@@ -244,7 +245,13 @@
             </div>
             <div class="col-md-6 mb-3">
                 <label class="form-label">Processor</label>
-                <input type="text" class="form-control" name="processor" required>
+                <select class="form-control" name="processor" required>
+                    <option value="">Select an Asset</option>
+                    <option value="i3">i3</option>
+                    <option value="i5">i5</option>
+                    <option value="i7">i7</option>
+                    <option value="i9">i9</option>
+                </select>
             </div>
         </div>
 
@@ -267,6 +274,7 @@
                     <option value="8">8</option>
                     <option value="16">16</option>
                     <option value="32">32</option>
+                    <option value="64">64</option>
                 </select>
             </div>
             <div class="col-md-6 mb-3">

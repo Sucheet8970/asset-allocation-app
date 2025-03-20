@@ -2,7 +2,7 @@ from django.urls import path
 from .views import (
     login_view, dashboard_view, logout_view, inventory_view, new_allocation_view, confirm_receipt,
     faulty_asset_replacement_view, repair_asset_view, update_license_status, asset_deallocation, export_inventory_to_excel, send_allocation_email, export_allocations_to_excel,
-    generate_pdf
+    generate_pdf, statistics_page, download_statistics_pdf
 )
 
 urlpatterns = [
@@ -20,4 +20,6 @@ urlpatterns = [
     path("confirm-receipt/<int:id>/", confirm_receipt, name="confirm_receipt"),
     path("new_allocation/download/", export_allocations_to_excel, name="export_allocations"),
     path('generate-pdf/<int:allocation_id>/', generate_pdf, name='generate_pdf'),
+    path('statistics/', statistics_page, name='statistics'),
+    path('statistics/download/', download_statistics_pdf, name='download_statistics_pdf'),
 ]
